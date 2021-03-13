@@ -71,7 +71,7 @@
         hookMethod(objc_getClass("MMSearchTableCellView"), NSSelectorFromString(@"setBackgroundColor:"), [self class], @selector(hook_searchCellSetBackgroundColor:));
         hookMethod(objc_getClass("MMSearchTableSectionHeaderView"), NSSelectorFromString(@"setBackgroundView:"), [self class], @selector(hook_searchHeaderSetBackgroundView:));
         hookMethod(objc_getClass("MMSearchTableCellView"), NSSelectorFromString(@"initWithFrame:"), [self class], @selector(hook_chatLogInitWithFrame:));
-         hookMethod(objc_getClass("MMSearchTableCellView"), NSSelectorFromString(@"prepareForReuse"), [self class], @selector(hook_chatLogPrepareForReuse));
+        hookMethod(objc_getClass("MMSearchTableCellView"), NSSelectorFromString(@"prepareForReuse"), [self class], @selector(hook_chatLogPrepareForReuse));
         hookMethod(objc_getClass("MMSearchViewController"), @selector(selectNextItem), [self class], @selector(hook_selectNextItem));
         //fuzzy
         hookMethod(objc_getClass("MMContactsDetailViewController"), NSSelectorFromString(@"viewWillAppear"), [self class], @selector(hook_contactsDetailViewWillAppear));
@@ -91,12 +91,14 @@
             hookMethod(objc_getClass("MMSystemMessageCellView"), @selector(contextMenuButton), [self class], @selector(hook_systemCellViewContextMenuButton));
             hookMethod(objc_getClass("MMChatsTableCellView"), @selector(setSelected:), [self class], @selector(hook_ChatsCellSetSelected:));
             hookMethod(objc_getClass("MMChatInfoView"), @selector(updateChatDetailButton), [self class], @selector(hook_updateChatDetailButton));
-             hookMethod(objc_getClass("MMSessionCreateSessionButtonRowView"), @selector(setHighlighted:), [self class], @selector(hook_creatSessionSetHighlighted:));
+            hookMethod(objc_getClass("MMSessionCreateSessionButtonRowView"), @selector(setHighlighted:), [self class], @selector(hook_creatSessionSetHighlighted:));
         }
         if ([YMWeChatPluginConfig sharedConfig].fuzzyMode) {
             hookMethod(objc_getClass("NSVisualEffectView"), @selector(material), [self class], @selector(hook_getMaterial));
         }
 #pragma clang diagnostic pop
+    } else {
+        hookMethod(objc_getClass("MMChatInfoView"), @selector(updateChatName), [self class], @selector(hook_updateChatName));
     }
 }
 
@@ -156,7 +158,7 @@
         //Fix #600
         if ([YMWeChatPluginConfig sharedConfig].brandChatsViewController && [YMWeChatPluginConfig sharedConfig].fuzzyMode) {
             dispatch_async(dispatch_get_main_queue(), ^{
-               [[YMWeChatPluginConfig sharedConfig].brandChatsViewController removeFromParentViewController];
+                [[YMWeChatPluginConfig sharedConfig].brandChatsViewController removeFromParentViewController];
                 [[YMWeChatPluginConfig sharedConfig].brandChatsViewController.view removeFromSuperview];
                 [YMWeChatPluginConfig sharedConfig].brandChatsViewController = nil;
             });
@@ -210,11 +212,11 @@
                 color = kRGBColor(206,207,211, 0.4);
             }
             if ([YMWeChatPluginConfig sharedConfig].preChatsCellView.selected == NO) {
-                 [[YMWeChatPluginConfig sharedConfig].preChatsCellView.focusingLineLayer removeFromSuperlayer];
+                [[YMWeChatPluginConfig sharedConfig].preChatsCellView.focusingLineLayer removeFromSuperlayer];
             }
             [YMWeChatPluginConfig sharedConfig].preChatsCellView = cell;
         } else {
-           color = [NSColor clearColor];
+            color = [NSColor clearColor];
         }
         cell.focusingLineLayer = [[objc_getClass("CAShapeLayer") alloc] init];
         CGPathRef path = CGPathCreateWithRect(cell.bounds, nil);
@@ -234,7 +236,7 @@
 {
     MMChatsTableCellView *cell = (MMChatsTableCellView *)self;
     [[YMThemeManager shareInstance] chatsCellViewAnimation:cell isSelected:cell.selected];
-
+    
     if ([YMWeChatPluginConfig sharedConfig].usingDarkTheme) {
         [cell.shapeLayer removeFromSuperlayer];
         NSColor *color = nil;
@@ -245,7 +247,7 @@
                 color = kRGBColor(206,207,211, 0.4);
             }
         } else {
-           color = [NSColor clearColor];
+            color = [NSColor clearColor];
         }
         cell.shapeLayer = [[objc_getClass("CAShapeLayer") alloc] init];
         CGPathRef path = CGPathCreateWithRect(cell.bounds, nil);
@@ -363,7 +365,7 @@
     MMSearchChatLogTableCellView *cell = (MMSearchChatLogTableCellView *)self;
     cell.hidden = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
-       [cell setSelected:YES];
+        [cell setSelected:YES];
         cell.hidden = NO;
     });
     [self hook_chatLogPrepareForReuse];
@@ -381,7 +383,7 @@
 {
     [self hook_searchHeaderSetBackgroundView:arg1];
     dispatch_async(dispatch_get_main_queue(), ^{
-       [[YMThemeManager shareInstance] changeTheme:arg1];
+        [[YMThemeManager shareInstance] changeTheme:arg1];
     });
 }
 
@@ -403,7 +405,7 @@
             
         }
     }
-
+    
     return [self hook_chatDetailAvatarImageView];
 }
 
@@ -422,7 +424,7 @@
             
         }
     }
-
+    
 }
 
 - (void)hook_textFieldSetTextColor:(NSAttributedString *)arg1
@@ -463,7 +465,7 @@
         
         for (int i = 0; i < 5; i++) {
             if (sv == nil) {
-                 break;
+                break;
             }
             if ([sv isKindOfClass:tcClass]
                 || [sv isKindOfClass:dvClass]
@@ -602,7 +604,7 @@
                 NSColor *radomColor = [NSColor whiteColor];
                 if (originalText.length > 0) {
                     NSMutableAttributedString *darkModelChatName = [[NSMutableAttributedString alloc] initWithString:originalText.string attributes:@{NSForegroundColorAttributeName : radomColor, NSFontAttributeName : [NSFont systemFontOfSize:12]}];
-                               [cell setAttributedStringValue:darkModelChatName];
+                    [cell setAttributedStringValue:darkModelChatName];
                 }
             }
         }
@@ -872,7 +874,7 @@
     
     if ([view isKindOfClass:[objc_getClass("MMSystemMessageCellView") class]]) {
         if (YMWeChatPluginConfig.sharedConfig.fuzzyMode) {
-           [[YMThemeManager shareInstance] changeTheme:view color:[NSColor clearColor]];
+            [[YMThemeManager shareInstance] changeTheme:view color:[NSColor clearColor]];
         }
         return;
     }
@@ -975,7 +977,7 @@
         }
         return;
     }
-
+    
     if ([view isKindOfClass:[objc_getClass("MMSplitView") class]]) {
         [[YMThemeManager shareInstance] changeTheme:view color:[NSColor redColor]];
         return;
@@ -1186,7 +1188,7 @@
     }
     
     if ([self isKindOfClass:objc_getClass("AVControlsContainerViewController")]) {
-         return;
+        return;
     }
     
     //Fix: TouchBar在少女模式下会变色
@@ -1232,11 +1234,11 @@
         MMGlobalChatManagerWindowController *window = (MMGlobalChatManagerWindowController *)self;
         for (NSView *sub in window.window.contentView.subviews) {
             if (![sub isKindOfClass:objc_getClass("MMCustomSearchField")]) {
-               [[YMThemeManager shareInstance] changeTheme:sub];
+                [[YMThemeManager shareInstance] changeTheme:sub];
             }
         }
     }
-  
+    
     [YMFuzzyManager fuzzyWindowViewController:(NSWindowController *)self];
 }
 
